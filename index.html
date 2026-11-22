@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HandsThatFeed – Community Food Donation Coordinator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="top">
+      <div class="bar">
+        <div class="logo">🍲 Hands That<span> Feed</span></div>
+        <div class="tabs" id="tabs"></div>
+        <div class="who"><span id="meName"></span></div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div>
+        <h1>Turn surplus food into community meals</h1>
+        <p>
+          HandsThatFeed connects food donors with verified community recipients,
+          so good food reaches people before it expires.
+        </p>
+        <button class="btn" onclick="go('list')">Browse donations</button>
+      </div>
+    </div>
+
+    <main>
+      <section id="home">
+        <div class="stats" id="stats"></div>
+        <h2>How it works</h2>
+        <div class="steps">
+          <div class="card">
+            <b>1</b>
+            <h3>Register &amp; verify</h3>
+            <p>
+              Donors and recipients create profiles; an admin verifies them.
+            </p>
+          </div>
+          <div class="card">
+            <b>2</b>
+            <h3>Post a donation</h3>
+            <p>Donors list food with quantity, expiry and pickup address.</p>
+          </div>
+          <div class="card">
+            <b>3</b>
+            <h3>Request &amp; match</h3>
+            <p>Recipients request pickup, or the admin auto-matches nearby.</p>
+          </div>
+          <div class="card">
+            <b>4</b>
+            <h3>Pick up &amp; track</h3>
+            <p>Status updates and notifications keep everyone informed.</p>
+          </div>
+        </div>
+        <div class="card bars">
+          <div class="row">
+            <h3>Donation report</h3>
+            <button class="btn o s" id="csv">⬇ Export CSV</button>
+          </div>
+          <div id="chart"></div>
+        </div>
+      </section>
+
+      <section id="list">
+        <h2>Donation listings</h2>
+        <div class="filters">
+          <select id="fStatus">
+            <option value="">All statuses</option>
+            <option>Available</option>
+            <option>Requested</option>
+            <option>Matched</option>
+            <option>Completed</option>
+            <option>Expired</option>
+          </select>
+          <select id="fCat">
+            <option value="">All categories</option>
+          </select>
+          <input id="fSearch" placeholder="Search food or donor…" />
+        </div>
+        <div class="grid" id="items"></div>
+      </section>
+
+      <section id="impact">
+        <h2>Where we donated</h2>
+        <p style="color: var(--m); margin-bottom: 14px">
+          Orphanages, old age homes, shelters and kitchens that received food
+          through completed pickups.
+        </p>
+        <div class="stats" id="impStats"></div>
+        <div class="filters">
+          <select id="iType">
+            <option value="">All types</option>
+            <option>Orphanage</option>
+            <option>Old age home</option>
+            <option>Shelter</option>
+            <option>Community kitchen</option>
+          </select>
+        </div>
+        <div class="grid" id="impList"></div>
+      </section>
+
+      <section id="post">
+        <h2>Post a donation</h2>
+        <div class="card" id="postBox"></div>
+      </section>
+
+      <section id="orgs">
+        <h2>Profiles</h2>
+        <div class="card" id="reqCard" style="margin-bottom: 18px"></div>
+        <div class="card" id="regCard" style="margin-bottom: 18px">
+          <div class="row" style="margin-bottom: 10px">
+            <h3>Create a new profile (admin only)</h3>
+            <button class="btn o s" type="button" id="xl">
+              ⬇ Download logins (Excel)
+            </button>
+          </div>
+          <form id="orgForm">
+            <label>Name <input id="oName" required /></label>
+            <label
+              >Role
+              <select id="oRole">
+                <option value="donor">Donor</option>
+                <option value="recipient">Recipient</option>
+              </select></label
+            >
+            <label
+              >Recipient type
+              <select id="oType">
+                <option>Orphanage</option>
+                <option>Old age home</option>
+                <option>Shelter</option>
+                <option>Community kitchen</option>
+              </select></label
+            >
+            <label
+              >Login ID <input id="oUser" required autocomplete="off"
+            /></label>
+            <label
+              >Phone number
+              <input
+                id="oPhone"
+                type="tel"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                placeholder="10 digits"
+                required
+            /></label>
+            <label
+              >Gmail
+              <input
+                id="oEmail"
+                type="email"
+                placeholder="name@gmail.com"
+                required
+            /></label>
+            <label
+              >Password <input id="oPw" type="password" minlength="4" required
+            /></label>
+            <label>Area <input id="oArea" required /></label>
+            <button class="btn" type="submit">Create profile</button>
+          </form>
+        </div>
+        <div class="grid" id="orgList"></div>
+      </section>
+
+      <section id="notes">
+        <div class="row">
+          <h2>Notifications</h2>
+          <button class="btn o s" id="read">Mark all read</button>
+        </div>
+        <div id="noteList"></div>
+      </section>
+    </main>
+    <footer class="foot">
+      <span>HandsThatFeed · Community Food Donation Coordinator</span
+      ><button class="btn d s" id="logout">Log out</button>
+    </footer>
+    <div id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Log in – HandsThatFeed</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="login">
+    <div class="card">
+      <div class="logo">🍲 Hands That<span> Feed</span></div>
+
+      <div class="panel on" id="pLogin">
+        <h1>Log in</h1>
+        <p class="sub">Sign in with the ID and password given by your admin.</p>
+        <form id="f">
+          <label
+            >Login ID, Gmail or phone number
+            <input id="u" required autocomplete="username"
+          /></label>
+          <label
+            >Password
+            <input
+              id="p"
+              type="password"
+              required
+              autocomplete="current-password"
+          /></label>
+          <div class="msg" id="msg" role="alert"></div>
+          <button class="btn" type="submit">Log in</button>
+        </form>
+        <div class="links">
+          <button class="link" data-p="pSign">Create an account</button
+          ><button class="link" data-p="pStat">Check request status</button>
+        </div>
+      </div>
+
+      <div class="panel" id="pSign">
+        <h1>Create an account</h1>
+        <p class="sub">
+          The admin reviews your details and creates your profile. You can log
+          in once it is approved.
+        </p>
+        <form id="sf">
+          <label
+            >Organisation or person name <input id="sName" required
+          /></label>
+          <label
+            >I am a
+            <select id="sRole">
+              <option value="donor">Donor</option>
+              <option value="recipient">Recipient</option>
+            </select></label
+          >
+          <label id="sTypeL" style="display: none"
+            >Recipient type
+            <select id="sType">
+              <option>Orphanage</option>
+              <option>Old age home</option>
+              <option>Shelter</option>
+              <option>Community kitchen</option>
+            </select></label
+          >
+          <label>Area <input id="sArea" required /></label>
+          <label
+            >Phone number
+            <input
+              id="sPhone"
+              type="tel"
+              pattern="[0-9]{10}"
+              maxlength="10"
+              placeholder="10 digits"
+              required
+          /></label>
+          <label
+            >Gmail
+            <input
+              id="sEmail"
+              type="email"
+              placeholder="name@gmail.com"
+              required
+          /></label>
+          <label
+            >Choose a password
+            <input
+              id="sPw"
+              type="password"
+              minlength="4"
+              required
+              autocomplete="new-password"
+          /></label>
+          <div class="msg" id="sMsg" role="alert"></div>
+          <button class="btn" type="submit">Send request to admin</button>
+        </form>
+        <div class="links">
+          <button class="link" data-p="pLogin">← Back to log in</button>
+        </div>
+      </div>
+
+      <div class="panel" id="pStat">
+        <h1>Request status</h1>
+        <p class="sub">Enter the phone number or Gmail you signed up with.</p>
+        <form id="tf">
+          <label>Phone number or Gmail <input id="tId" required /></label>
+          <button class="btn" type="submit">Check status</button>
+        </form>
+        <div class="result" id="tRes" role="status"></div>
+        <div class="links">
+          <button class="link" data-p="pLogin">← Back to log in</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const KEY = "shareMeal_v7",
+        SESS = "htf_session",
+        REQK = "htf_requests";
+      const FALLBACK = [
+        {
+          id: "o1",
+          user: "DonorCodeVerse",
+          pw: "Mealify2",
+          phone: "9876500001",
+          email: "spicegarden@gmail.com",
+        },
+        {
+          id: "o2",
+          user: "DonorCodeVerse2",
+          pw: "Mealify4",
+          phone: "9876500003",
+          email: "sunrisebakery@gmail.com",
+        },
+        {
+          id: "o3",
+          user: "DonorCodeVerse3",
+          pw: "Mealify5",
+          phone: "9876500002",
+          email: "sevakitchen@gmail.com",
+        },
+        {
+          id: "o4",
+          user: "RecipientCodeVerse3",
+          pw: "Mealify6",
+          phone: "9876500004",
+          email: "hopeshelter@gmail.com",
+        },
+        {
+          id: "o5",
+          user: "RecipientCodeVerse",
+          pw: "Mealify3",
+          phone: "9876500005",
+          email: "balashram@gmail.com",
+        },
+        {
+          id: "o6",
+          user: "RecipientCodeVerse4",
+          pw: "Mealify7",
+          phone: "9876500006",
+          email: "shantihome@gmail.com",
+        },
+      ];
+      const $ = (id) => document.getElementById(id);
+      function accounts() {
+        try {
+          const s = JSON.parse(localStorage.getItem(KEY));
+          if (s && s.orgs) return s.orgs;
+        } catch (e) {}
+        return FALLBACK;
+      }
+      const getR = () => {
+        try {
+          return JSON.parse(localStorage.getItem(REQK)) || [];
+        } catch (e) {
+          return [];
+        }
+      };
+      const setR = (r) => {
+        try {
+          localStorage.setItem(REQK, JSON.stringify(r));
+        } catch (e) {}
+      };
+      const isPhone = (u) => /^[\d\s+()-]+$/.test(u);
+      const last10 = (s) =>
+        String(s || "")
+          .replace(/\D/g, "")
+          .slice(-10);
+      const same = (x, u) =>
+        isPhone(u)
+          ? last10(u).length === 10 && last10(x.phone) === last10(u)
+          : String(x.email || "").toLowerCase() === u;
+      function show(id) {
+        document
+          .querySelectorAll(".panel")
+          .forEach((p) => p.classList.toggle("on", p.id === id));
+      }
+      document.querySelectorAll("[data-p]").forEach(
+        (b) =>
+          (b.onclick = (e) => {
+            e.preventDefault();
+            show(b.dataset.p);
+          }),
+      );
+
+      $("f").onsubmit = (e) => {
+        e.preventDefault();
+        const u = $("u").value.trim().toLowerCase(),
+          p = $("p").value;
+        let id = null;
+        if (u === "codeverse" && p === "Mealify") id = "admin";
+        else {
+          const o = accounts().find(
+            (x) =>
+              x.pw === p &&
+              (String(x.user || "").toLowerCase() === u || same(x, u)),
+          );
+          if (o) id = o.id;
+        }
+        if (!id) {
+          const known =
+            u === "codeverse" ||
+            accounts().some(
+              (x) => String(x.user || "").toLowerCase() === u || same(x, u),
+            );
+          const r = getR().find((x) => same(x, u));
+          if (!known && !r) {
+            if (isPhone(u)) $("sPhone").value = last10(u);
+            else if (u.includes("@")) $("sEmail").value = u;
+            $("p").value = "";
+            $("msg").textContent = "";
+            $("sMsg").className = "msg info";
+            $("sMsg").textContent =
+              "We couldn't find an account for that ID. Fill in your details to request one.";
+            show("pSign");
+            return;
+          }
+          if (!known && r && r.pw === p && r.status !== "approved")
+            $("msg").textContent =
+              r.status === "pending"
+                ? "Your request is waiting for admin approval. You can log in after it is approved."
+                : "Your request was not approved. Please contact the admin.";
+          else $("msg").textContent = "Incorrect password. Try again.";
+          return;
+        }
+        try {
+          localStorage.setItem(SESS, id);
+        } catch (err) {}
+        location.href = "index.html";
+      };
+
+      $("sRole").onchange = () =>
+        ($("sTypeL").style.display =
+          $("sRole").value === "recipient" ? "" : "none");
+
+      function status(u) {
+        const r = getR()
+          .filter((x) => same(x, u))
+          .pop();
+        $("tRes").className = "result";
+        if (!r) {
+          $("tRes").textContent =
+            "No request found for that phone number or Gmail.";
+          return;
+        }
+        if (r.status === "pending")
+          $("tRes").textContent =
+            "Pending: the admin has your details and will approve them soon.";
+        else if (r.status === "approved") {
+          $("tRes").className = "result good";
+          $("tRes").textContent =
+            "Approved by admin. You can now log in with your Login ID (" +
+            r.user +
+            "), Gmail or phone number and the password you chose.";
+        } else
+          $("tRes").textContent = "Not approved. Please contact the admin.";
+      }
+      $("tf").onsubmit = (e) => {
+        e.preventDefault();
+        status($("tId").value.trim().toLowerCase());
+      };
+
+      $("sf").onsubmit = (e) => {
+        e.preventDefault();
+        const role = $("sRole").value,
+          phone = $("sPhone").value.trim(),
+          email = $("sEmail").value.trim().toLowerCase();
+        const R = getR();
+        const used =
+          accounts().some(
+            (x) =>
+              last10(x.phone) === phone ||
+              String(x.email || "").toLowerCase() === email,
+          ) ||
+          R.some(
+            (x) =>
+              x.status !== "rejected" &&
+              (x.phone === phone || x.email === email),
+          );
+        if (used) {
+          $("sMsg").className = "msg";
+          $("sMsg").textContent =
+            "This phone number or Gmail is already registered or waiting for approval.";
+          return;
+        }
+        R.push({
+          id: Math.random().toString(36).slice(2, 9),
+          name: $("sName").value.trim(),
+          role,
+          type: role === "recipient" ? $("sType").value : "",
+          area: $("sArea").value.trim(),
+          phone,
+          email,
+          pw: $("sPw").value,
+          status: "pending",
+          time: new Date().toLocaleString(),
+        });
+        setR(R);
+        $("sMsg").textContent = "";
+        e.target.reset();
+        $("sTypeL").style.display = "none";
+        $("tId").value = phone;
+        show("pStat");
+        status(phone);
+      };
+    </script>
+  </body>
+</html>
